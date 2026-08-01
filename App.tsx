@@ -31,6 +31,18 @@ function GameCard({ game, onPress }: { game: UserGame; onPress: () => void }) {
   );
 }
 
+function ResultCard({ item, onAdd, onClose }: { item: Game; onAdd: (g: Game) => void; onClose: () => void }) {
+  const [err, setErr] = useState(false);
+  return (
+    <TouchableOpacity style={s.rCard} onPress={() => { onAdd(item); onClose(); }} activeOpacity={0.75}>
+      {!err
+        ? <Image source={{ uri: item.coverUrl }} style={s.rImg} onError={() => setErr(true)} resizeMode="cover" />
+        : <View style={[s.rImg, s.cardFallback]}><Text style={s.initials}>{item.name.slice(0,2).toUpperCase()}</Text></View>}
+      <Text style={s.rName} numberOfLines={1}>{item.name}</Text>
+    </TouchableOpacity>
+  );
+}
+
 function AddModal({ visible, onClose, onAdd, ids }: { visible: boolean; onClose: () => void; onAdd: (g: Game) => void; ids: string[] }) {
   const [q, setQ] = useState('');
   useEffect(() => { if (!visible) setQ(''); }, [visible]);
@@ -51,18 +63,13 @@ function AddModal({ visible, onClose, onAdd, ids }: { visible: boolean; onClose:
             ? <View style={s.hint}><Text style={s.hintText}>Type to search games</Text></View>
             : results.length === 0
               ? <View style={s.hint}><Text style={s.hintText}>No games found</Text></View>
-              : <FlatList data={results} keyExtractor={i => i.id} numColumns={3} contentContainerStyle={{ paddingBottom: 8 }}
-                  renderItem={({ item }) => {
-                    const [e, setE] = useState(false);
-                    return (
-                      <TouchableOpacity style={s.rCard} onPress={() => { onAdd(item); onClose(); }} activeOpacity={0.75}>
-                        {!e
-                          ? <Image source={{ uri: item.coverUrl }} style={s.rImg} onError={() => setE(true)} resizeMode="cover" />
-                          : <View style={[s.rImg, s.cardFallback]}><Text style={s.initials}>{item.name.slice(0,2).toUpperCase()}</Text></View>}
-                        <Text style={s.rName} numberOfLines={1}>{item.name}</Text>
-                      </TouchableOpacity>
-                    );
-                  }} />}
+              : <FlatList
+                  data={results}
+                  keyExtractor={i => i.id}
+                  numColumns={3}
+                  contentContainerStyle={{ paddingBottom: 8 }}
+                  renderItem={({ item }) => <ResultCard item={item} onAdd={onAdd} onClose={onClose} />}
+                />}
         </View>
       </View>
     </Modal>
@@ -100,9 +107,7 @@ export default function App() {
               <Text style={s.addBtnText}>Add Game</Text>
             </TouchableOpacity>
           </View>
-
           <Text style={s.section}>Your Library</Text>
-
           {games.length === 0 ? (
             <View style={s.empty}>
               <Ionicons name="game-controller-outline" size={48} color={C.muted} />
@@ -119,7 +124,6 @@ export default function App() {
             </View>
           )}
         </ScrollView>
-
         <AddModal visible={showModal} onClose={() => setShowModal(false)} onAdd={add} ids={games.map(g => g.id)} />
       </View>
     </SafeAreaProvider>
