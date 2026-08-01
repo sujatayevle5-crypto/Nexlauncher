@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "NexLaunch",
+    "slug": "nexlaunch",
+    "version": "1.0.0",
+    "orientation": "landscape",
+    "userInterfaceStyle": "dark",
+    "android": { "package": "com.nexlaunch.app" },
+    "extra": { "eas": { "projectId": "9a183c06-6058-4be7-ad81-bbb866278feb" } }
+  }
+}
